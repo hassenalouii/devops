@@ -3,6 +3,7 @@ package tn.esprit.spring.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,18 +37,23 @@ public class EmployeServiceImpl implements IEmployeService {
 		return employe.getId();
 	}
 
-	public void mettreAjourEmailByEmployeId(String email, int employeId) {
-		Employe employe = employeRepository.findById(employeId).get();
-		employe.setEmail(email);
-		employeRepository.save(employe);
-
+	public void mettreAjourEmailByEmployeId(String email, int employeId) {	
+		Employe employe = employeRepository.findById(employeId).orElse(null);
+		if (employe != null){
+			employe.setEmail(email);
+			employeRepository.save(employe);
+		}
+		else {
+			System.out.print("l'objet est null");
+		}
 	}
 
 	@Transactional	
 	public void affecterEmployeADepartement(int employeId, int depId) {
-		Departement depManagedEntity = deptRepoistory.findById(depId).get();
-		Employe employeManagedEntity = employeRepository.findById(employeId).get();
-
+		Departement depManagedEntity = deptRepoistory.findById(depId).orElse(null);
+		Employe employeManagedEntity = employeRepository.findById(employeId).orElse(null);
+		if(depManagedEntity != null){
+			if(employeManagedEntity != null){
 		if(depManagedEntity.getEmployes() == null){
 
 			List<Employe> employes = new ArrayList<>();
@@ -58,6 +64,10 @@ public class EmployeServiceImpl implements IEmployeService {
 			depManagedEntity.getEmployes().add(employeManagedEntity);
 
 		}
+		
+			} else {System.out.print("employe est null");}
+			
+		}else { System.out.print("departement n'existe pas");}
 
 	}
 	@Transactional
